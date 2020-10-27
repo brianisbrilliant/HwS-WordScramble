@@ -26,6 +26,14 @@ struct ContentView: View {
         showingError = true
     }
     
+    func isLongEnough(word: String) -> Bool {
+        if word.count >= 4 {
+            return true
+        } else {
+            return false
+        }
+    }
+    
     // var body is it's own function, don't build this inside of there.
     func addNewWord() {
         // lowercase and trim the word, to make sure we don't add duplicate words with case differences.
@@ -39,6 +47,11 @@ struct ContentView: View {
         // throw errors if the given word is nonsense or already guessed.
         guard isOriginal(word: answer) else {
             wordError(title: "Word has been used already", message: "Be more original")
+            return
+        }
+        
+        guard isLongEnough(word: answer) else {
+            wordError(title: "Word is too short", message: "Have some self respect!")
             return
         }
         
@@ -72,6 +85,9 @@ struct ContentView: View {
                 return
             }
         }
+        
+        // added code, reset list, keep score.
+        usedWords.removeAll()       // this doesn't clear the list.
         
         // if we are here then there was a problem. Crash the program lol.
         fatalError("Could not load start.txt from our bundle.")
@@ -128,6 +144,11 @@ struct ContentView: View {
                 
             }
         .navigationBarTitle(rootWord)
+        .navigationBarItems(trailing:
+            Button("New Word") {
+                self.startGame()
+            }
+        )
         .onAppear(perform: startGame)
             .alert(isPresented: $showingError) {
                 Alert(title: Text(errorTitle), message: Text(errorMessage), dismissButton: .default(Text("Ok")))
